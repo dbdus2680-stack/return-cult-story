@@ -32,7 +32,7 @@ function booleanValue(state: GameState, key: string): boolean {
 }
 
 function characterIds(condition: string): string[] {
-  const ids = condition.match(/PC-\d{3}/g) ?? [];
+  const ids: string[] = [...(condition.match(/PC-\d{3}/g) ?? [])];
   for (const match of condition.matchAll(/PC-(\d{3})\s*\/\s*(\d{3})/g)) {
     ids.push(`PC-${match[1]}`, `PC-${match[2]}`);
   }
