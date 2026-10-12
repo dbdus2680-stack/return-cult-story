@@ -17,15 +17,15 @@ async function loadFromDb(db: D1DatabaseLike): Promise<StoryContent | null> {
     if (!loaded.events?.length) return null;
     return {
       ...seedContent,
-      truths: loaded.truths,
+      truths: loaded.truths as StoryContent["truths"],
       characters: loaded.characters as StoryContent["characters"],
-      anchors: loaded.anchors,
+      anchors: loaded.anchors as StoryContent["anchors"],
       events: loaded.events as StoryContent["events"],
-      clues: loaded.clues,
-      items: loaded.items,
-      stateDefinitions: loaded.state_definitions,
-      endings: loaded.endings,
-      locations: loaded.locations,
+      clues: loaded.clues as StoryContent["clues"],
+      items: loaded.items as StoryContent["items"],
+      stateDefinitions: loaded.state_definitions as StoryContent["stateDefinitions"],
+      endings: loaded.endings as StoryContent["endings"],
+      locations: loaded.locations as StoryContent["locations"],
     };
   } catch {
     return null;
