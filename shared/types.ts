@@ -33,10 +33,13 @@ export interface StoryEvent {
   발생조건: string;
   "요약/본문 훅": string;
   "선택 A": string;
+  "A 조건"?: string;
   "A 결과": string;
   "선택 B": string;
+  "B 조건"?: string;
   "B 결과": string;
   "선택 C": string;
+  "C 조건"?: string;
   "C 결과": string;
   "관련 TRUTH": string;
   "관련 CLUE": string;
@@ -61,6 +64,7 @@ export interface GameState {
   characterId: string;
   day: number;
   seed: number;
+  runId?: string;
   stats: Record<string, number>;
   rels: Record<string, number>;
   flags: Record<string, boolean>;
@@ -69,4 +73,53 @@ export interface GameState {
   items: string[];
   clues: string[];
   history: string[];
+}
+
+export interface PlaytestLastChoice {
+  eventId: string;
+  label: string;
+  effect: string;
+}
+
+export interface LocalSave {
+  version: 1;
+  contentVersion: string;
+  savedAt: string;
+  state: GameState;
+  eventId: string | null;
+  lastChoice?: PlaytestLastChoice | null;
+}
+
+export type PlaytestNoteCategory = "문장" | "선택지" | "스토리" | "조건/분기" | "밸런스" | "버그" | "아이디어";
+export type PlaytestNotePriority = "나중에" | "수정 필요" | "중요";
+export type PlaytestNoteStatus = "open" | "applied" | "wontfix";
+
+export interface PlaytestNoteDraft {
+  schemaVersion: 1;
+  body: string;
+  category: PlaytestNoteCategory;
+  priority: PlaytestNotePriority;
+  contentVersion: string;
+  eventId: string | null;
+  characterId: string;
+  worldDay: number;
+  seed: number;
+  runId: string;
+  deviceId: string;
+  lastChoice: PlaytestLastChoice | null;
+  stateSnapshot: GameState;
+  eventSnapshot: StoryEvent | null;
+  clientMeta: {
+    path: string;
+    userAgent: string;
+    viewport: string;
+  };
+}
+
+export interface PlaytestNoteRecord extends PlaytestNoteDraft {
+  id: string;
+  status: PlaytestNoteStatus;
+  createdAt: string;
+  updatedAt: string;
+  resolvedAt: string | null;
 }

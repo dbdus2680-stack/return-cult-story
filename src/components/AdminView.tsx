@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
-import type { StoryContent } from "../../shared/types";
+import { useEffect, useMemo, useState } from "react";
+import type { PlaytestNoteRecord, PlaytestNoteStatus, StoryContent } from "../../shared/types";
+import { getPlaytestKey, listPlaytestNotes, notesToBatchText, setPlaytestKey, updatePlaytestNoteStatus } from "../playtest";
 
-type Tab = "dashboard" | "timeline" | "events" | "characters" | "truths";
+type Tab = "dashboard" | "timeline" | "events" | "characters" | "truths" | "notes";
 
 interface Props {
   content: StoryContent;
@@ -11,6 +12,12 @@ interface Props {
 export function AdminView({ content, counts }: Props) {
   const [tab, setTab] = useState<Tab>("dashboard");
   const [query, setQuery] = useState("");
+  const [notes, setNotes] = useState<PlaytestNoteRecord[]>([]);
+  const [notesLoading, setNotesLoading] = useState(false);
+  const [notesError, setNotesError] = useState("");
+  const [testerKey, setTesterKeyValue] = useState(() => getPlaytestKey());
+  const [noteFilter, setNoteFilter] = useState<"open" | "all">("open");
+  const [copyStatus, setCopyStatus] = useState("");
 
   const events = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -21,6 +28,48 @@ export function AdminView({ content, counts }: Props) {
     );
   }, [content.events, query]);
 
+  const visibleNotes = useMemo(
+    () => noteFilter === "open" ? notes.filter((note) => note.status === "open") : notes,
+    [noteFilter, notes],
+  );
+
+  async function refreshNotes() {
+    if (testerKey.trim()) setPlaytestKey(testerKey);
+    setNotesLoading(true);
+    setNotesError("");
+    try {
+      setNotes(await listPlaytestNotes());
+    } catch (error) {
+      setNotesError(error instanceof Error ? error.message : "메모를 불러오지 못했습니다.");
+    } finally {
+      setNotesLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (tab === "notes" && testerKey.trim() && notes.length === 0) void refreshNotes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab]);
+
+  async function changeNoteStatus(id: string, status: PlaytestNoteStatus) {
+    try {
+      await updatePlaytestNoteStatus(id, status);
+      setNotes((current) => current.map((note) => note.id === id
+        ? { ...note, status, resolvedAt: status === "open" ? null : new Date().toISOString() }
+        : note));
+    } catch (error) {
+      setNotesError(error instanceof Error ? error.message : "상태 변경 실패");
+    }
+  }
+
+  async function copyNotes() {
+    const target = visibleNotes;
+    if (!target.length) return;
+    await navigator.clipboard.writeText(notesToBatchText(target));
+    setCopyStatus(`${target.length}개 메모 복사 완료`);
+    window.setTimeout(() => setCopyStatus(""), 1400);
+  }
+
   return (
     <main className="admin-shell">
       <nav className="admin-nav">
@@ -30,6 +79,7 @@ export function AdminView({ content, counts }: Props) {
           ["events", "사건 DB"],
           ["characters", "캐릭터"],
           ["truths", "진실/단서"],
+          ["notes", `플레이메모${notes.filter((n) => n.status === "open").length ? ` ${notes.filter((n) => n.status === "open").length}` : ""}`],
         ].map(([key, label]) => (
           <button key={key} className={tab === key ? "active" : ""} onClick={() => setTab(key as Tab)}>{label}</button>
         ))}
@@ -38,7 +88,7 @@ export function AdminView({ content, counts }: Props) {
       <section className="admin-content">
         {tab === "dashboard" && (
           <>
-            <div className="section-heading"><h2>스토리 관리</h2><span>현재 v{content.meta.version} · 읽기 전용 초기 이관본</span></div>
+            <div className="section-heading"><h2>스토리 관리</h2><span>현재 v{content.meta.version} · 읽기 전용 스토리 원본</span></div>
             <div className="metric-grid">
               <Metric label="플레이 캐릭터" value={counts.characters} />
               <Metric label="사건 카드" value={counts.events} />
@@ -50,9 +100,9 @@ export function AdminView({ content, counts }: Props) {
               <p>메인 앵커는 고정하고, 캐릭터의 시작일·관계·지식·아이템이 같은 사건의 의미를 바꾸도록 관리한다.</p>
               <div className="pipeline">CHARACTER → DAY → EVENT POOL → CONDITION → CHOICE → STATE → NEXT EVENT</div>
             </div>
-            <div className="admin-card warning">
-              <strong>현재 관리자 편집은 잠겨 있음</strong>
-              <p>Cloudflare Access와 D1이 연결되기 전에는 서버 쓰기 API를 열지 않는다. 로컬 플레이와 데이터 검토만 가능하다.</p>
+            <div className="admin-card">
+              <strong>플레이테스트 메모는 별도 서버 원본</strong>
+              <p>모바일에서 작성한 메모는 D1에 저장하고, 콘텐츠 버전·당시 사건·GameState·Seed·직전 선택을 함께 보관한다. 스토리 원본 편집 API는 계속 잠가 둔다.</p>
             </div>
           </>
         )}
@@ -129,6 +179,48 @@ export function AdminView({ content, counts }: Props) {
               </article>
             ))}
           </div>
+        )}
+
+        {tab === "notes" && (
+          <>
+            <div className="section-heading note-heading">
+              <div><h2>플레이테스트 메모</h2><span>모든 기기의 서버 메모를 한 번에 검토·복사</span></div>
+              <div className="note-tools">
+                <input type="password" value={testerKey} onChange={(e) => setTesterKeyValue(e.target.value)} placeholder="테스터 코드" />
+                <button onClick={refreshNotes} disabled={notesLoading}>{notesLoading ? "불러오는 중" : "새로고침"}</button>
+                <button onClick={copyNotes} disabled={!visibleNotes.length}>반영용 텍스트 복사</button>
+              </div>
+            </div>
+            <div className="note-filter">
+              <button className={noteFilter === "open" ? "active" : ""} onClick={() => setNoteFilter("open")}>미반영 {notes.filter((n) => n.status === "open").length}</button>
+              <button className={noteFilter === "all" ? "active" : ""} onClick={() => setNoteFilter("all")}>전체 {notes.length}</button>
+              {copyStatus && <span>{copyStatus}</span>}
+            </div>
+            {notesError && <div className="admin-card warning">{notesError}</div>}
+            <div className="note-list">
+              {visibleNotes.map((note) => (
+                <article className={`note-card priority-${note.priority.replace(/\s/g, "-")}`} key={note.id}>
+                  <div className="note-card-head">
+                    <div>
+                      <div className="card-id">{note.eventId ?? "BETWEEN_EVENTS"} · DAY {note.worldDay} · v{note.contentVersion}</div>
+                      <strong>{note.category} · {note.priority}</strong>
+                    </div>
+                    <span className={`note-status status-${note.status}`}>{note.status}</span>
+                  </div>
+                  <p className="note-body">{note.body}</p>
+                  <div className="note-context">{note.characterId} · seed {note.seed} · device {note.deviceId.slice(0, 8)} · {new Date(note.createdAt).toLocaleString()}</div>
+                  {note.eventSnapshot && <details><summary>당시 화면</summary><p>{note.eventSnapshot["요약/본문 훅"]}</p></details>}
+                  <details><summary>재현 정보</summary><pre>{JSON.stringify({ lastChoice: note.lastChoice, state: note.stateSnapshot }, null, 2)}</pre></details>
+                  <div className="note-actions">
+                    {note.status !== "applied" && <button onClick={() => changeNoteStatus(note.id, "applied")}>반영 완료</button>}
+                    {note.status !== "wontfix" && <button onClick={() => changeNoteStatus(note.id, "wontfix")}>보류/미반영</button>}
+                    {note.status !== "open" && <button onClick={() => changeNoteStatus(note.id, "open")}>다시 열기</button>}
+                  </div>
+                </article>
+              ))}
+              {!notesLoading && !visibleNotes.length && <div className="admin-card"><p>표시할 메모가 없습니다.</p></div>}
+            </div>
+          </>
         )}
       </section>
     </main>

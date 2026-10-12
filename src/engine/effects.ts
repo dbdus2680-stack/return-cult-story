@@ -59,21 +59,5 @@ export function applyEffect(effect: string, input: GameState): GameState {
     }
   }
 
-  if (/WORLD_POLICE\s*\+\s*(\d+)/.test(effect)) {
-    const n = Number(effect.match(/WORLD_POLICE\s*\+\s*(\d+)/)?.[1] ?? 0);
-    state.worlds.WORLD_POLICE = (state.worlds.WORLD_POLICE ?? 0) + n;
-  }
-  if (/WORLD_SEARCH\s*\+\s*(\d+)/.test(effect)) {
-    const n = Number(effect.match(/WORLD_SEARCH\s*\+\s*(\d+)/)?.[1] ?? 0);
-    state.worlds.WORLD_SEARCH = (state.worlds.WORLD_SEARCH ?? 0) + n;
-  }
-  if (/WORLD_TECH_ALERT\s*\+\s*(\d+)/.test(effect)) {
-    const n = Number(effect.match(/WORLD_TECH_ALERT\s*\+\s*(\d+)/)?.[1] ?? 0);
-    state.worlds.WORLD_TECH_ALERT = (state.worlds.WORLD_TECH_ALERT ?? 0) + n;
-  }
-
-  if (effect.includes("ACCESS_GATE_SITE=1")) state.flags.ACCESS_GATE_SITE = true;
-  if (effect.includes("ACCESS_CONTROL_ROOM=1")) state.flags.ACCESS_CONTROL_ROOM = true;
-
   return state;
 }

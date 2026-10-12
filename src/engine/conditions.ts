@@ -25,14 +25,33 @@ function numericValue(state: GameState, key: string): number {
   return state.stats[id] ?? state.rels[id] ?? state.worlds[id] ?? 0;
 }
 
-export function conditionMatches(condition: string, state: GameState): boolean {
-  if (!condition || condition === "-" || condition === "없음") return true;
+function booleanValue(state: GameState, key: string): boolean {
+  if (key.startsWith("KNOW_")) return Boolean(state.knows[key]);
+  if (key.startsWith("FLAG_") || key.startsWith("ACCESS_")) return Boolean(state.flags[key]);
+  return false;
+}
 
-  const pcIds = condition.match(/PC-\d{3}/g);
-  if (pcIds && !pcIds.includes(state.characterId)) return false;
+function characterIds(condition: string): string[] {
+  const ids: string[] = [...(condition.match(/PC-\d{3}/g) ?? [])];
+  for (const match of condition.matchAll(/PC-(\d{3})\s*\/\s*(\d{3})/g)) {
+    ids.push(`PC-${match[1]}`, `PC-${match[2]}`);
+  }
+  return [...new Set(ids)];
+}
+
+function atomMatches(condition: string, state: GameState): boolean {
+  const pcIds = characterIds(condition);
+  if (pcIds.length && !pcIds.includes(state.characterId)) return false;
+
+  for (const match of condition.matchAll(/((?:KNOW|FLAG|ACCESS)_[A-Z0-9_]+)\s*=\s*(true|false|1|0)/gi)) {
+    const [, key, rawValue] = match;
+    const expected = rawValue === "1" || rawValue.toLowerCase() === "true";
+    if (booleanValue(state, key) !== expected) return false;
+  }
 
   for (const match of condition.matchAll(/([A-Z_]+|관찰|말재주|배짱|전산|기술|스트레스|동조도)\s*(>=|<=|=|>|<)\s*(-?\d+)/g)) {
     const [, rawKey, op, rawValue] = match;
+    if (rawKey.startsWith("KNOW_") || rawKey.startsWith("FLAG_") || rawKey.startsWith("ACCESS_")) continue;
     const left = numericValue(state, rawKey);
     const right = Number(rawValue);
     if (op === ">=" && !(left >= right)) return false;
@@ -48,12 +67,21 @@ export function conditionMatches(condition: string, state: GameState): boolean {
   for (const item of condition.match(/ITEM-\d{3}/g) ?? []) {
     if (!state.items.includes(item)) return false;
   }
-  if (condition.includes("KNOW_GATE_REAL=1") && !state.knows.KNOW_GATE_REAL) return false;
-  if (condition.includes("KNOW_EXPERIMENT=1") && !state.knows.KNOW_EXPERIMENT) return false;
-  if (condition.includes("ACCESS_GATE_SITE=1") && !state.flags.ACCESS_GATE_SITE) return false;
-  if (condition.includes("ACCESS_CONTROL_ROOM=1") && !state.flags.ACCESS_CONTROL_ROOM) return false;
 
   return true;
+}
+
+export function conditionMatches(condition: string, state: GameState): boolean {
+  const normalized = condition?.trim();
+  if (!normalized || normalized === "-" || normalized === "없음") return true;
+
+  const orGroups = normalized.split(/\s*(?:또는|\|\|)\s*/).filter(Boolean);
+  if (orGroups.length > 1) return orGroups.some((group) => conditionMatches(group, state));
+
+  const andGroups = normalized.split(/\s*(?:그리고|&&|&)\s*/).filter(Boolean);
+  if (andGroups.length > 1) return andGroups.every((group) => conditionMatches(group, state));
+
+  return atomMatches(normalized, state);
 }
 
 export function eventEligible(event: StoryEvent, state: GameState): boolean {
