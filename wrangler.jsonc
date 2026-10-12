@@ -1,0 +1,20 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "return-cult-story",
+  "compatibility_date": "2026-10-12",
+  "main": "./worker/index.ts",
+  "assets": {
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  }
+
+  // Cloudflare D1 생성 후 아래 블록의 주석을 해제하고 database_id를 입력하세요.
+  // "d1_databases": [
+  //   {
+  //     "binding": "DB",
+  //     "database_name": "return-cult-story-db",
+  //     "database_id": "PASTE_DATABASE_ID_HERE",
+  //     "migrations_dir": "migrations"
+  //   }
+  // ]
+}
