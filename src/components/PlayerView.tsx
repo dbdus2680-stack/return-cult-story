@@ -1,18 +1,35 @@
 import { useEffect, useMemo, useState } from "react";
-import type { GameState, LocalSave, StoryContent, StoryEvent } from "../../shared/types";
+import type {
+  GameState,
+  LocalSave,
+  PlaytestLastChoice,
+  PlaytestNoteCategory,
+  PlaytestNotePriority,
+  StoryContent,
+  StoryEvent,
+} from "../../shared/types";
 import { conditionMatches } from "../engine/conditions";
 import { applyEffect } from "../engine/effects";
 import { createInitialState, chooseNextEvent } from "../engine/game";
+import { createPlaytestNote, getDeviceId, getPlaytestKey, setPlaytestKey } from "../playtest";
 
 interface Props { content: StoryContent; }
 
 const SAVE_KEY = "return-cult-story.save.v1";
+const CATEGORIES: PlaytestNoteCategory[] = ["문장", "선택지", "스토리", "조건/분기", "밸런스", "버그", "아이디어"];
+const PRIORITIES: PlaytestNotePriority[] = ["나중에", "수정 필요", "중요"];
 
 type Choice = {
   label: string;
   condition?: string;
   effect: string;
 };
+
+function newRunId(): string {
+  return typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? crypto.randomUUID()
+    : `run-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
 
 function readSave(): LocalSave | null {
   try {
@@ -29,6 +46,14 @@ export function PlayerView({ content }: Props) {
   const [state, setState] = useState<GameState | null>(null);
   const [event, setEvent] = useState<StoryEvent | null>(null);
   const [saved, setSaved] = useState<LocalSave | null>(() => readSave());
+  const [lastChoice, setLastChoice] = useState<PlaytestLastChoice | null>(null);
+  const [memoOpen, setMemoOpen] = useState(false);
+  const [memoBody, setMemoBody] = useState("");
+  const [memoCategory, setMemoCategory] = useState<PlaytestNoteCategory>("문장");
+  const [memoPriority, setMemoPriority] = useState<PlaytestNotePriority>("수정 필요");
+  const [testerKey, setTesterKey] = useState(() => getPlaytestKey());
+  const [memoStatus, setMemoStatus] = useState("");
+  const [memoSending, setMemoSending] = useState(false);
 
   const character = useMemo(
     () => content.characters.find((c) => c.ID === state?.characterId),
@@ -56,26 +81,30 @@ export function PlayerView({ content }: Props) {
       savedAt: new Date().toISOString(),
       state,
       eventId: event?.ID ?? null,
+      lastChoice,
     };
     localStorage.setItem(SAVE_KEY, JSON.stringify(nextSave));
     setSaved(nextSave);
-  }, [content.meta.version, event, state]);
+  }, [content.meta.version, event, lastChoice, state]);
 
   function begin(characterId: string) {
     const picked = content.characters.find((c) => c.ID === characterId)!;
-    const nextState = createInitialState(picked);
+    const nextState = { ...createInitialState(picked), runId: newRunId() };
     const nextEvent = chooseNextEvent(content.events, nextState);
+    setLastChoice(null);
     setState(nextState);
     setEvent(nextEvent);
   }
 
   function resume() {
     if (!saved) return;
+    const resumedState = saved.state.runId ? saved.state : { ...saved.state, runId: newRunId() };
     const currentEvent = saved.eventId
       ? content.events.find((candidate) => candidate.ID === saved.eventId) ?? null
       : null;
-    setState(saved.state);
-    setEvent(currentEvent ?? chooseNextEvent(content.events, saved.state));
+    setLastChoice(saved.lastChoice ?? null);
+    setState(resumedState);
+    setEvent(currentEvent ?? chooseNextEvent(content.events, resumedState));
   }
 
   function choose(choice: Choice) {
@@ -83,6 +112,7 @@ export function PlayerView({ content }: Props) {
     const next = applyEffect(choice.effect, state);
     next.history.push(event.ID);
     next.seed = (next.seed + 0x6d2b79f5) >>> 0;
+    setLastChoice({ eventId: event.ID, label: choice.label, effect: choice.effect });
     setState(next);
     setEvent(null);
   }
@@ -102,6 +132,7 @@ export function PlayerView({ content }: Props) {
   function quitToCharacterSelect() {
     setState(null);
     setEvent(null);
+    setLastChoice(null);
     setSaved(readSave());
   }
 
@@ -110,6 +141,51 @@ export function PlayerView({ content }: Props) {
     setSaved(null);
     setState(null);
     setEvent(null);
+    setLastChoice(null);
+  }
+
+  async function submitMemo() {
+    if (!state || !memoBody.trim()) return;
+    if (!testerKey.trim()) {
+      setMemoStatus("테스터 코드를 입력해 주세요.");
+      return;
+    }
+    setPlaytestKey(testerKey);
+    setMemoSending(true);
+    setMemoStatus("서버에 저장 중…");
+    try {
+      await createPlaytestNote({
+        schemaVersion: 1,
+        body: memoBody.trim(),
+        category: memoCategory,
+        priority: memoPriority,
+        contentVersion: content.meta.version,
+        eventId: event?.ID ?? null,
+        characterId: state.characterId,
+        worldDay: state.day,
+        seed: state.seed,
+        runId: state.runId ?? "legacy-run",
+        deviceId: getDeviceId(),
+        lastChoice,
+        stateSnapshot: state,
+        eventSnapshot: event,
+        clientMeta: {
+          path: location.pathname,
+          userAgent: navigator.userAgent,
+          viewport: `${window.innerWidth}x${window.innerHeight}`,
+        },
+      });
+      setMemoStatus("서버 저장 완료");
+      setMemoBody("");
+      window.setTimeout(() => {
+        setMemoOpen(false);
+        setMemoStatus("");
+      }, 450);
+    } catch (error) {
+      setMemoStatus(error instanceof Error ? error.message : "메모 저장에 실패했습니다.");
+    } finally {
+      setMemoSending(false);
+    }
   }
 
   if (!state) {
@@ -186,7 +262,7 @@ export function PlayerView({ content }: Props) {
         {event ? (
           <>
             <div className="event-meta">
-              <span>DAY {state.day}</span><span>{event.장소}</span>
+              <span>DAY {state.day}</span><span>{event.장소}</span><span>{event.ID}</span>
             </div>
             <p className="story-text">{event["요약/본문 훅"]}</p>
             <div className="choices">
@@ -237,6 +313,28 @@ export function PlayerView({ content }: Props) {
         </details>
         <button className="text-button" onClick={quitToCharacterSelect}>캐릭터 선택으로</button>
       </aside>
+
+      <button className="memo-fab" aria-label="플레이테스트 메모" onClick={() => setMemoOpen(true)}>✎</button>
+
+      {memoOpen && (
+        <div className="memo-backdrop" onClick={() => !memoSending && setMemoOpen(false)}>
+          <section className="memo-sheet" onClick={(e) => e.stopPropagation()}>
+            <div className="memo-head">
+              <div><div className="card-id">{event?.ID ?? "BETWEEN_EVENTS"} · DAY {state.day}</div><strong>수정 메모</strong></div>
+              <button className="memo-close" onClick={() => !memoSending && setMemoOpen(false)}>×</button>
+            </div>
+            <textarea autoFocus value={memoBody} onChange={(e) => setMemoBody(e.target.value)} placeholder="걸으면서 바로 적기. 예: 이 선택지 너무 뻔함 / 앞 단서 반응 필요" />
+            <div className="memo-grid">
+              <label>분류<select value={memoCategory} onChange={(e) => setMemoCategory(e.target.value as PlaytestNoteCategory)}>{CATEGORIES.map((x) => <option key={x}>{x}</option>)}</select></label>
+              <label>중요도<select value={memoPriority} onChange={(e) => setMemoPriority(e.target.value as PlaytestNotePriority)}>{PRIORITIES.map((x) => <option key={x}>{x}</option>)}</select></label>
+            </div>
+            <label className="memo-key">테스터 코드<input type="password" value={testerKey} onChange={(e) => setTesterKey(e.target.value)} placeholder="기기별 1회 입력" /></label>
+            <p className="memo-context">v{content.meta.version} · {state.characterId} · seed {state.seed} · 상태/본문/직전선택 자동 첨부</p>
+            {memoStatus && <div className="memo-status">{memoStatus}</div>}
+            <button className="primary-action memo-submit" disabled={memoSending || !memoBody.trim()} onClick={submitMemo}>{memoSending ? "서버 저장 중…" : "서버에 메모 저장"}</button>
+          </section>
+        </div>
+      )}
     </main>
   );
 }
