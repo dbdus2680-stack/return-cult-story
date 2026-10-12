@@ -8,7 +8,7 @@ import type {
   StoryContent,
   StoryEvent,
 } from "../../shared/types";
-import { conditionMatches } from "../engine/conditions";
+import { conditionMatches, eventEligible } from "../engine/conditions";
 import { applyEffect } from "../engine/effects";
 import { createInitialState, chooseNextEvent } from "../engine/game";
 import { createPlaytestNote, getDeviceId, getPlaytestKey, setPlaytestKey } from "../playtest";
@@ -109,12 +109,18 @@ export function PlayerView({ content }: Props) {
 
   function choose(choice: Choice) {
     if (!state || !event || (choice.condition && !conditionMatches(choice.condition, state))) return;
+    const currentEvent = event;
     const next = applyEffect(choice.effect, state);
-    next.history.push(event.ID);
+    next.history.push(currentEvent.ID);
     next.seed = (next.seed + 0x6d2b79f5) >>> 0;
-    setLastChoice({ eventId: event.ID, label: choice.label, effect: choice.effect });
+    setLastChoice({ eventId: currentEvent.ID, label: choice.label, effect: choice.effect });
     setState(next);
-    setEvent(null);
+
+    const followUpId = currentEvent["후속/재등장"]?.trim();
+    const followUp = followUpId && followUpId !== "-"
+      ? content.events.find((candidate) => candidate.ID === followUpId) ?? null
+      : null;
+    setEvent(followUp && eventEligible(followUp, next) ? followUp : null);
   }
 
   function advanceDay() {
@@ -241,6 +247,7 @@ export function PlayerView({ content }: Props) {
     { label: event["선택 A"], condition: event["A 조건"], effect: event["A 결과"] },
     { label: event["선택 B"], condition: event["B 조건"], effect: event["B 결과"] },
     { label: event["선택 C"], condition: event["C 조건"], effect: event["C 결과"] },
+    { label: event["선택 D"] ?? "", condition: event["D 조건"], effect: event["D 결과"] ?? "" },
   ].filter((choice) => Boolean(choice.label)) : [];
 
   return (
