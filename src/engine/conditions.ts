@@ -31,11 +31,17 @@ function booleanValue(state: GameState, key: string): boolean {
   return false;
 }
 
-export function conditionMatches(condition: string, state: GameState): boolean {
-  if (!condition || condition === "-" || condition === "없음") return true;
+function characterIds(condition: string): string[] {
+  const ids = condition.match(/PC-\d{3}/g) ?? [];
+  for (const match of condition.matchAll(/PC-(\d{3})\s*\/\s*(\d{3})/g)) {
+    ids.push(`PC-${match[1]}`, `PC-${match[2]}`);
+  }
+  return [...new Set(ids)];
+}
 
-  const pcIds = condition.match(/PC-\d{3}/g);
-  if (pcIds && !pcIds.includes(state.characterId)) return false;
+function atomMatches(condition: string, state: GameState): boolean {
+  const pcIds = characterIds(condition);
+  if (pcIds.length && !pcIds.includes(state.characterId)) return false;
 
   for (const match of condition.matchAll(/((?:KNOW|FLAG|ACCESS)_[A-Z0-9_]+)\s*=\s*(true|false|1|0)/gi)) {
     const [, key, rawValue] = match;
@@ -63,6 +69,19 @@ export function conditionMatches(condition: string, state: GameState): boolean {
   }
 
   return true;
+}
+
+export function conditionMatches(condition: string, state: GameState): boolean {
+  const normalized = condition?.trim();
+  if (!normalized || normalized === "-" || normalized === "없음") return true;
+
+  const orGroups = normalized.split(/\s*(?:또는|\|\|)\s*/).filter(Boolean);
+  if (orGroups.length > 1) return orGroups.some((group) => conditionMatches(group, state));
+
+  const andGroups = normalized.split(/\s*(?:그리고|&&|&)\s*/).filter(Boolean);
+  if (andGroups.length > 1) return andGroups.every((group) => conditionMatches(group, state));
+
+  return atomMatches(normalized, state);
 }
 
 export function eventEligible(event: StoryEvent, state: GameState): boolean {
