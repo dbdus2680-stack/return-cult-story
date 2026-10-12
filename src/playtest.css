@@ -1,0 +1,51 @@
+.memo-fab {
+  position: fixed; right: max(18px, env(safe-area-inset-right)); bottom: max(18px, env(safe-area-inset-bottom));
+  width: 52px; height: 52px; border: 1px solid #78969a; border-radius: 50%; background: #d6ebe7; color: #0b1116;
+  font-size: 24px; line-height: 1; cursor: pointer; z-index: 30; box-shadow: 0 8px 30px rgba(0,0,0,.38);
+}
+.memo-backdrop { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.64); display: flex; align-items: end; justify-content: center; padding: 14px; }
+.memo-sheet { width: min(620px, 100%); max-height: 88vh; overflow: auto; background: #0e161d; border: 1px solid #31414a; border-radius: 18px 18px 12px 12px; padding: 17px; box-shadow: 0 -10px 45px rgba(0,0,0,.45); }
+.memo-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 13px; }
+.memo-head strong { display: block; margin-top: 5px; font-size: 18px; }
+.memo-close { border: 0; background: transparent; color: #91a5ae; font-size: 28px; cursor: pointer; }
+.memo-sheet textarea { width: 100%; min-height: 142px; resize: vertical; border: 1px solid #31414a; background: #080d12; color: #eef3f6; border-radius: 10px; padding: 13px; font: inherit; line-height: 1.55; }
+.memo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 9px; }
+.memo-grid label, .memo-key { color: #7f949d; font-size: 11px; display: grid; gap: 5px; }
+.memo-grid select, .memo-key input, .note-tools input { width: 100%; border: 1px solid #2b3942; background: #0a1117; color: #eef3f6; border-radius: 8px; padding: 10px; font: inherit; }
+.memo-key { margin-top: 9px; }
+.memo-context { color: #61757f; font-size: 10px; line-height: 1.5; margin: 10px 0; }
+.memo-status { color: #bad3cf; font-size: 12px; margin: 8px 0; }
+.memo-submit { width: 100%; margin-top: 3px; }
+
+.note-heading { align-items: flex-start; }
+.note-heading > div:first-child span { display: block; margin-top: 5px; }
+.note-tools { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+.note-tools input { width: 170px; }
+.note-tools button, .note-filter button, .note-actions button { border: 1px solid #2a3942; background: #0d141b; color: #b5c4ca; border-radius: 8px; padding: 9px 11px; cursor: pointer; }
+.note-filter { display: flex; align-items: center; gap: 7px; margin: 0 0 12px; }
+.note-filter button.active { background: #d6ebe7; color: #0b1116; border-color: #d6ebe7; }
+.note-filter span { color: #93b8b2; font-size: 11px; margin-left: 4px; }
+.note-list { display: grid; gap: 9px; }
+.note-card { border: 1px solid #26343d; background: #0d141b; border-radius: 13px; padding: 15px; }
+.note-card.priority-중요 { border-color: #766052; }
+.note-card-head { display: flex; justify-content: space-between; gap: 12px; align-items: start; }
+.note-card-head strong { display: block; margin-top: 6px; }
+.note-status { font-size: 10px; border: 1px solid #34454e; border-radius: 20px; padding: 5px 8px; color: #83979f; }
+.status-applied { color: #a5c9b4; border-color: #395747; }
+.status-wontfix { color: #b7a58f; border-color: #594a3c; }
+.note-body { font-size: 16px !important; color: #d9e2e5 !important; white-space: pre-wrap; }
+.note-context { color: #657a84; font-size: 10px; word-break: break-all; }
+.note-card details p { color: #9dabb1; font-size: 12px; }
+.note-card pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 260px; overflow: auto; background: #080d12; padding: 10px; border-radius: 8px; color: #83979f; font-size: 10px; }
+.note-actions { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+
+@media (max-width: 760px) {
+  .memo-fab { width: 48px; height: 48px; right: 14px; bottom: 14px; }
+  .memo-backdrop { padding: 0; }
+  .memo-sheet { border-radius: 18px 18px 0 0; padding: 16px 14px calc(16px + env(safe-area-inset-bottom)); }
+  .memo-grid { grid-template-columns: 1fr 1fr; }
+  .note-tools { width: 100%; justify-content: stretch; }
+  .note-tools input { width: 100%; }
+  .note-tools button { flex: 1; }
+  .note-card-head { flex-direction: column; }
+}
