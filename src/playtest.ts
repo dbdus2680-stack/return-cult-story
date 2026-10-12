@@ -23,7 +23,7 @@ export function getDeviceId(): string {
   return value;
 }
 
-function authHeaders(): HeadersInit {
+function authHeaders(): Record<string, string> {
   const key = getPlaytestKey();
   return key ? { "X-Playtest-Key": key } : {};
 }
