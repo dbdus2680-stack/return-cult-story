@@ -33,10 +33,13 @@ export interface StoryEvent {
   발생조건: string;
   "요약/본문 훅": string;
   "선택 A": string;
+  "A 조건"?: string;
   "A 결과": string;
   "선택 B": string;
+  "B 조건"?: string;
   "B 결과": string;
   "선택 C": string;
+  "C 조건"?: string;
   "C 결과": string;
   "관련 TRUTH": string;
   "관련 CLUE": string;
@@ -69,4 +72,12 @@ export interface GameState {
   items: string[];
   clues: string[];
   history: string[];
+}
+
+export interface LocalSave {
+  version: 1;
+  contentVersion: string;
+  savedAt: string;
+  state: GameState;
+  eventId: string | null;
 }
