@@ -41,6 +41,9 @@ export interface StoryEvent {
   "선택 C": string;
   "C 조건"?: string;
   "C 결과": string;
+  "선택 D"?: string;
+  "D 조건"?: string;
+  "D 결과"?: string;
   "관련 TRUTH": string;
   "관련 CLUE": string;
   "후속/재등장": string;
