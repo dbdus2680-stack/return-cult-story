@@ -1,5 +1,5 @@
 import seedContent from "../shared/story-content";
-import type { PlaytestNoteDraft, PlaytestNoteRecord, PlaytestNoteStatus, StoryContent } from "../shared/types";
+import type { PlaytestNoteDraft, PlaytestNoteRecord, PlaytestNoteStatus } from "../shared/types";
 
 interface D1Result<T = unknown> { results?: T[]; }
 interface D1PreparedStatementLike {
@@ -11,32 +11,6 @@ interface D1DatabaseLike { prepare(query: string): D1PreparedStatementLike; }
 interface Env { DB?: D1DatabaseLike; PLAYTEST_KEY?: string; }
 
 const NOTE_STATUSES = new Set<PlaytestNoteStatus>(["open", "applied", "wontfix"]);
-
-async function loadFromDb(db: D1DatabaseLike): Promise<StoryContent | null> {
-  try {
-    const tables = ["truths", "characters", "anchors", "events", "clues", "items", "state_definitions", "endings", "locations"] as const;
-    const loaded: Record<string, unknown[]> = {};
-    for (const table of tables) {
-      const response = await db.prepare(`SELECT data_json FROM ${table} ORDER BY sort_order, id`).all<{ data_json: string }>();
-      loaded[table] = (response.results ?? []).map((row) => JSON.parse(row.data_json));
-    }
-    if (!loaded.events?.length) return null;
-    return {
-      ...seedContent,
-      truths: loaded.truths as StoryContent["truths"],
-      characters: loaded.characters as StoryContent["characters"],
-      anchors: loaded.anchors as StoryContent["anchors"],
-      events: loaded.events as StoryContent["events"],
-      clues: loaded.clues as StoryContent["clues"],
-      items: loaded.items as StoryContent["items"],
-      stateDefinitions: loaded.state_definitions as StoryContent["stateDefinitions"],
-      endings: loaded.endings as StoryContent["endings"],
-      locations: loaded.locations as StoryContent["locations"],
-    };
-  } catch {
-    return null;
-  }
-}
 
 async function ensurePlaytestTable(db: D1DatabaseLike): Promise<void> {
   await db.prepare(`CREATE TABLE IF NOT EXISTS playtest_notes (
@@ -169,9 +143,11 @@ export default {
       return Response.json({ ok: true, app: "return-cult-story", database: Boolean(env.DB), playtestNotes: Boolean(env.DB && env.PLAYTEST_KEY), version: seedContent.meta.version });
     }
     if (url.pathname === "/api/content") {
-      const dbContent = env.DB ? await loadFromDb(env.DB) : null;
-      return Response.json({ source: dbContent ? "Cloudflare D1" : "내장 시드", content: dbContent ?? seedContent }, {
-        headers: { "Cache-Control": "public, max-age=60" },
+      // Until the revision/publish pipeline is implemented, GitHub-bundled story data is
+      // the only runtime Source of Truth. D1 remains available for playtest notes only.
+      // This prevents stale D1 seed rows from replacing a newer client bundle mid-session.
+      return Response.json({ source: "내장 시드", content: seedContent }, {
+        headers: { "Cache-Control": "no-store" },
       });
     }
 
