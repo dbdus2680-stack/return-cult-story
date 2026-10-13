@@ -3,7 +3,7 @@
 LAST UPDATE: 2026-10-13
 
 ## 운영체계
-- 총괄관제 단일채널 운영: **활성화 준비 완료**
+- 총괄관제 단일채널 운영: **활성화 완료**
 - GitHub 장기기억 구조: v1.0
 - 기능실: FLOW / WRITING / VISUAL / DEV
 - GitHub를 프로젝트 운영상 Source of Truth로 사용
@@ -16,10 +16,12 @@ LAST UPDATE: 2026-10-13
 
 ## 저장소 기준점
 - 운영체계 도입 시작 당시 main commit: `35007452312e3731f83d35b44f9af1689af4c36a`
-- 당시 최신 기능 변경: DAY 1 opening 원고 반영 / PC-001 고1 신입생 Canon / 4-choice 지원 / same-day Scene chaining
+- AI 협력시스템 v1.0 main 반영 commit: `262616465d70af5146d8771d2694d36d999d2cfe`
+- 운영체계 활성화 상태 정리 commit: 이후 main 최신 commit 기준
+- 운영체계 도입 전 최신 기능 변경: DAY 1 opening 원고 반영 / PC-001 고1 신입생 Canon / 4-choice 지원 / same-day Scene chaining
 
 ## 현재 마일스톤
-`AI 협력시스템 v1.0 활성화 + 현 콘텐츠 상태 재인덱싱`
+`AI 협력시스템 v1.0 복구시험 + 현 콘텐츠 상태 재인덱싱`
 
 ## 확정된 운영 결정
 1. 총괄관제실을 사용자 단일 접점으로 사용한다.
@@ -42,6 +44,9 @@ LAST UPDATE: 2026-10-13
 - 치명적 Blocker 없음
 - 세부 내용: `ai/state/OPEN_BLOCKERS.md`
 
+## 완료된 총괄 Task
+- `MASTER-002` — AI 협력시스템 v1.0 main 활성화 완료
+
 ## 다음 총괄관제 시작 시 반드시 수행
 1. `ai/roles/MASTER_ORCHESTRATOR.md` 읽기
 2. 이 `CURRENT_STATE.md` 읽기
@@ -49,8 +54,9 @@ LAST UPDATE: 2026-10-13
 4. `ai/state/OPEN_BLOCKERS.md` 읽기
 5. 최신 Handover 읽기
 6. **MASTER-001 — 저장소 콘텐츠 상태 재인덱싱** 실행
-7. Story / Flow / Visual / Dev의 실제 진행상태를 확인해 이 파일을 갱신
-8. 사용자에게 복구 결과와 다음 권장 작업을 짧게 보고
+7. 동시에 **MASTER-003 — 새 총괄채팅 복구 시험**으로 복구 성공 여부 판정
+8. Story / Flow / Visual / Dev의 실제 진행상태를 확인해 이 파일을 갱신
+9. 사용자에게 복구 결과와 다음 권장 작업을 짧게 보고
 
 ## 인수인계 성공 판정
 새 채팅이 사용자의 과거 설명 반복 없이 아래를 스스로 파악하면 성공이다.
@@ -59,8 +65,9 @@ LAST UPDATE: 2026-10-13
 - 4개 기능실의 역할 경계
 - GitHub가 Source of Truth라는 것
 - 현재 최우선 작업이 `MASTER-001`이라는 것
-- 운영체계 v1.0 도입 직후라는 것
+- `MASTER-002`가 완료되었다는 것
 - 현재 치명적 Blocker가 없다는 것
+- 최신 Handover를 찾아 읽어야 한다는 것
 
 ## 주의
 이 파일은 대화 요약이 아니라 **현재 작업 가능한 상태**만 기록한다. 과거 시행착오나 폐기된 토론은 넣지 않는다.
