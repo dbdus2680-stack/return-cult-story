@@ -39,15 +39,15 @@
 - NOTES: 과거 설명 재요청 없이 MASTER role, 4 rooms, state, tasks, blockers, handover 및 MASTER-001을 복구·실행함.
 
 ### FLOW-001 — PC1 DAY 1 잔여 Scene 003~005 사전설계
-- STATUS: IN_PROGRESS
+- STATUS: DONE
 - OWNER: FLOW
 - PURPOSE: 현재 PC1-D01-002에서 끊긴 DAY 1을 003~005까지 확장하고 DAY 종료 수렴점을 확정
 - INPUT: `PC1-D01-001`, `PC1-D01-002`, `ANC-001`, PC-001 Canon, FLOW 운영기준
-- OUTPUT: Scene Brief 003~005 + Scene 순서 + 선택지 수/분기예산 + State 제안 + DAY 종료조건
+- OUTPUT: `flow/PC1_DAY1_FLOW.md`
 - DEPENDS ON: MASTER-001
 - BLOCKER: 없음
 - RELATED SCENE/EVENT: PC1-D01-001~005 / ANC-001
-- NOTES: 원고 작성 전 FLOW 권한으로 구조만 확정한다. 003~005 본문/대사는 WRITING 담당.
+- NOTES: 003 교실 적응 → 004 점심/일상 친밀도 → 005 하교 전 첫 위화감 → DAY END. 005에서 `KNOW_FRIEND_ODD=1`, `FLAG_D01_COMPLETE=1`을 모든 선택에 설정하도록 승인.
 
 ### FLOW-002 — 콘텐츠 SoT / State Registry / DSL 표준 초기화
 - STATUS: READY
@@ -60,14 +60,15 @@
 - NOTES: DEV-001의 입력 규약이 된다.
 
 ### WR-001 — PC1 DAY 1 Scene 003~005 원고
-- STATUS: BLOCKED
+- STATUS: READY
 - OWNER: WRITING
 - PURPOSE: FLOW-001 Scene Brief에 맞춰 본문/대사/선택지/Immediate Reaction 집필
-- INPUT: FLOW-001 승인본
+- INPUT: `flow/PC1_DAY1_FLOW.md`
 - OUTPUT: 003~005 원고 승인 후보
 - DEPENDS ON: FLOW-001
-- BLOCKER: FLOW-001 미완료
+- BLOCKER: 없음
 - RELATED SCENE/EVENT: PC1-D01-003~005
+- NOTES: 다음 콘텐츠 작업. 원고 완료 후 FLOW finalize로 전달.
 
 ### VIS-001 — PC1 DAY 1 Visual/Audio Spec
 - STATUS: BLOCKED
