@@ -42,6 +42,21 @@ function readSave(): LocalSave | null {
   }
 }
 
+function repairLegacyState(input: GameState): GameState {
+  const flags = { ...input.flags };
+  const completed = new Set(input.history);
+
+  // 2026-10-13 이전 DAY 1 effect parser는 숫자가 포함된 FLAG key를
+  // 저장하지 못했다. 이미 선택을 끝낸 저장은 history를 기준으로 복구한다.
+  if (completed.has("PC1-D01-001")) flags.FLAG_D01_P1_DONE = true;
+  if (completed.has("PC1-D01-002")) flags.FLAG_D01_P2_DONE = true;
+  if (completed.has("PC1-D01-003")) flags.FLAG_D01_P3_DONE = true;
+  if (completed.has("PC1-D01-004")) flags.FLAG_D01_P4_DONE = true;
+  if (completed.has("PC1-D01-005")) flags.FLAG_D01_COMPLETE = true;
+
+  return { ...input, flags };
+}
+
 export function PlayerView({ content }: Props) {
   const [state, setState] = useState<GameState | null>(null);
   const [event, setEvent] = useState<StoryEvent | null>(null);
@@ -98,7 +113,8 @@ export function PlayerView({ content }: Props) {
 
   function resume() {
     if (!saved) return;
-    const resumedState = saved.state.runId ? saved.state : { ...saved.state, runId: newRunId() };
+    const repaired = repairLegacyState(saved.state);
+    const resumedState = repaired.runId ? repaired : { ...repaired, runId: newRunId() };
     const currentEvent = saved.eventId
       ? content.events.find((candidate) => candidate.ID === saved.eventId) ?? null
       : null;
