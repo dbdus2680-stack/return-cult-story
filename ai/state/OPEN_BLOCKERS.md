@@ -1,6 +1,6 @@
 # OPEN BLOCKERS
 
-치명적 release blocker는 현재 없음.
+치명적 코드 blocker는 현재 없음.
 
 ## BLOCKER-FLOW-001
 TYPE: FLOW
@@ -12,15 +12,37 @@ OWNER: WRITING + FLOW + DEV
 STATUS: RESOLVED
 
 ## BLOCKER-DEV-001
-TYPE: SAVE
+TYPE: RUNTIME
 SCENE/EVENT: PC1-D01-001 → 002
-FOUND BY: 사용자 플레이
-문제: effect parser의 State key 정규식이 숫자를 허용하지 않아 `FLAG_D01_P1_DONE=1`이 저장되지 않았음. 그 결과 002 진입조건이 false가 되어 첫 선택 이후 진행이 끊겼음.
+FOUND BY: 사용자 실제 플레이 + Chromium E2E
+문제 1: effect parser의 State key 정규식이 숫자를 허용하지 않아 `FLAG_D01_P1_DONE=1`이 저장되지 않았음.
+문제 2: condition parser의 numeric key 정규식도 숫자를 허용하지 않아, `FLAG_D01_P1_DONE=1`의 boolean 판정 후 문자열 일부 `DONE=1`을 별도 숫자조건으로 재해석하여 다시 false 처리했음.
 해결:
 - effect parser key를 `[A-Z0-9_]+`로 수정.
-- 기존 저장에서 history를 기준으로 `FLAG_D01_P1_DONE` 등 DAY1 진행 Flag를 자동 복구하도록 저장 호환 패치 추가.
+- condition parser numeric key도 `[A-Z0-9_]+`로 수정하고 `FLAG_/KNOW_/ACCESS_`는 숫자 비교에서 제외.
+- 기존 저장에서 history를 기준으로 `FLAG_D01_P1_DONE` 등 DAY1 진행 Flag를 자동 복구.
+검증: Playwright Chromium 실제 버튼 클릭으로 001→002→003→004→005→DAY END PASS. legacy save 이어하기→002 PASS.
 OWNER: DEV
 STATUS: RESOLVED
+
+## BLOCKER-DATA-SOURCE-001
+TYPE: API
+SCENE/EVENT: 프로젝트 공통
+FOUND BY: 실제 브라우저 디버깅
+문제: 앱은 번들 story seed로 시작한 뒤 `/api/content`의 D1 콘텐츠로 교체할 수 있었고, D1 story rows가 GitHub 최신 원고보다 오래된 경우 한 세션 안에서 서로 다른 콘텐츠 버전을 참조할 위험이 있었음.
+해결: revision/publish 파이프라인이 구현되기 전까지 `/api/content`는 항상 GitHub 번들 seed를 반환하도록 고정. D1은 플레이테스트 메모 저장에만 사용.
+OWNER: DEV
+STATUS: RESOLVED
+
+## BLOCKER-DEPLOY-001
+TYPE: BUILD
+SCENE/EVENT: production
+FOUND BY: 사용자 UAT 준비
+문제: 코드/Chromium E2E는 통과했으나 현재 실행환경에서 `workers.dev` production URL을 직접 조회할 수 없어 latest production 반영 여부를 서버측에서 검증할 수 없음.
+영향: 사용자가 구버전 production을 열면 수정 전 증상이 그대로 보일 수 있음.
+판별 기준: 사이트 상단이 `RETURN CULT / v0.1.2`이면 이번 수정본. 이전 버전이면 production 배포가 아직 최신 main을 받지 못한 상태.
+OWNER: DEV + MASTER
+STATUS: OPEN
 
 ## BLOCKER-DATA-001
 TYPE: DATA
@@ -54,7 +76,7 @@ STATUS: OPEN
 ## 등록 형식
 ```text
 ## BLOCKER-ID
-TYPE: FLOW / WRITING / VISUAL / DATA / SAVE / API / BUILD / ROLE
+TYPE: FLOW / WRITING / VISUAL / DATA / SAVE / API / BUILD / ROLE / RUNTIME
 SCENE/EVENT:
 FOUND BY:
 문제:
