@@ -49,7 +49,9 @@ function atomMatches(condition: string, state: GameState): boolean {
     if (booleanValue(state, key) !== expected) return false;
   }
 
-  for (const match of condition.matchAll(/([A-Z_]+|관찰|말재주|배짱|전산|기술|스트레스|동조도)\s*(>=|<=|=|>|<)\s*(-?\d+)/g)) {
+  // State keys may contain digits (e.g. FLAG_D01_P1_DONE). Parse the whole key so
+  // a boolean assignment is not accidentally re-read as a suffix like DONE=1.
+  for (const match of condition.matchAll(/([A-Z0-9_]+|관찰|말재주|배짱|전산|기술|스트레스|동조도)\s*(>=|<=|=|>|<)\s*(-?\d+)/g)) {
     const [, rawKey, op, rawValue] = match;
     if (rawKey.startsWith("KNOW_") || rawKey.startsWith("FLAG_") || rawKey.startsWith("ACCESS_")) continue;
     const left = numericValue(state, rawKey);
