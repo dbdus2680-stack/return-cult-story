@@ -3,110 +3,97 @@
 LAST UPDATE: 2026-10-13
 
 ## 운영체계
-- 총괄관제 단일채널 운영: **활성화 완료**
-- GitHub 장기기억 구조: v1.0
+- 총괄관제 단일채널: 활성화 완료
 - 기능실: FLOW / WRITING / VISUAL / DEV
-- GitHub를 프로젝트 운영상 Source of Truth로 사용
-- 채팅은 교체 가능한 작업공간으로 취급
-- 새 총괄채팅 GitHub 복구시험: **SUCCESS**
-
-## 현재 인수인계
-- HANDOVER: `ai/handoffs/HANDOVER-2026-10-13-001.md`
-- 복구 결과: 과거 설명 재요청 없이 역할/상태/작업/Blocker/다음 행동 복구 성공
-- `MASTER-003` 완료
-
-## 저장소 기준점
-- AI 협력시스템 v1.0 main 반영 commit: `262616465d70af5146d8771d2694d36d999d2cfe`
-- 재인덱싱 직전 main: `f8d4830ee111245370adf548ee028c488aa0586c`
-- 콘텐츠 재인덱싱 상세: `ai/state/CONTENT_INDEX.md`
-- PC1 DAY1 Flow Brief: `flow/PC1_DAY1_FLOW.md`
+- GitHub: 프로젝트 Source of Truth
+- 새 총괄채팅 GitHub 복구시험: SUCCESS
 
 ## 현재 마일스톤
-`PC-001 DAY 1 playable slice 완성`
+`PC-001 DAY 1 playable slice 검증`
 
-## 확정된 운영 결정
-1. 총괄관제실을 사용자 단일 접점으로 사용한다.
-2. 기능실은 별도 상시 채팅이 아니라 논리적 조직으로 유지한다.
-3. 신규 Scene 제작 표준 순서:
-   `FLOW 사전설계 → WRITING → FLOW 확정 → VISUAL → DEV → PLAYTEST → MASTER REVIEW`
-4. 플로우실은 구조뿐 아니라 게임시스템과 Canon/STORY_BIBLE의 최종 소유자다.
-5. 연출·이미지실은 Visual + Audio Direction을 담당한다.
-6. 플로우 QA는 설계검증, 개발 QA는 실행검증이다.
-7. 채팅 교체 전 CURRENT_STATE / ACTIVE_TASKS / OPEN_BLOCKERS / 중요 Decision을 최신화한다.
-8. 대화 전문은 GitHub에 저장하지 않고 확정된 결과·상태·결정만 기록한다.
+## 저장소 기준
+- DAY1 Flow: `flow/PC1_DAY1_FLOW.md` — FLOW APPROVED
+- DAY1 원고: `story/PC1_DAY1.md` — WRITING APPROVED
+- Runtime: `shared/data/events-1.json`
+- 콘텐츠 버전: `0.1.1`
 
-## 재인덱싱 결과
+## PC-001 DAY 1 현재 상태
 
-### 콘텐츠
-- event JSON 기준 사건/Scene 데이터: **34개**
-- PC-001 DAY 1 본문화/실행 연결 완료: `PC1-D01-001`, `PC1-D01-002`
-- 위 2개는 기능실 승인 기록이 없어 WRITING/FLOW는 `REVIEW`, DEV는 `PLAYABLE`
-- 나머지 32개는 원본 상태가 대부분 `초안`: WRITING/FLOW `DRAFT`, DEV `PARTIAL`
-- Scene 전용 Visual Spec/Asset은 아직 확인되지 않아 VISUAL `NONE`
+### 전개
+```text
+PC1-D01-001  한도윤 재회
+→ PC1-D01-002  첫 대화 / 태도 선택
+→ PC1-D01-003  새 반 적응
+→ PC1-D01-004  점심 / 평범한 친밀도
+→ PC1-D01-005  하교 전 첫 위화감
+→ DAY 1 END
+```
 
-### PC-001 DAY 1 Flow
-- PC-001 Canon: 고1 신입생, DAY 1, 해온고 1학년 교실
-- `PC1-D01-001` → `PC1-D01-002` 기존 구현 유지
-- FLOW-001에서 다음 구조 승인:
-  - `PC1-D01-003`: 새 반 적응 / 평범한 기준선
-  - `PC1-D01-004`: 점심·교내 생활 / 도윤과 일상적 친밀도 강화
-  - `PC1-D01-005`: 하교 전 작은 위화감 / DAY 종료
-- 003~005는 장기분기 없이 재합류
-- 005의 모든 선택이 `KNOW_FRIEND_ODD=1`, `FLAG_D01_COMPLETE=1` 생성
-- DAY 1에서 귀향회/게이트를 직접 노출하지 않음
-- 실제 원고/실행데이터는 아직 미반영
+### 진행 State
+- 001 완료: `FLAG_D01_P1_DONE`
+- 002 완료: `FLAG_D01_P2_DONE`
+- 003 완료: `FLAG_D01_P3_DONE`
+- 004 완료: `FLAG_D01_P4_DONE`
+- DAY1 완료: `FLAG_D01_COMPLETE`
+- 친구 이상 인식: `KNOW_FRIEND_ODD`
 
-### DEV
-- React/TypeScript/Vite 플레이어/관리자 앱 존재
-- 상태/조건/효과/RNG 엔진 존재
-- local save/resume 존재
-- 4-choice 및 same-day follow-up 지원 존재
-- Cloudflare Worker + D1 binding 존재
-- 서버 플레이테스트 메모 workflow 존재
-- 재인덱싱 직전 최신 main CI: **SUCCESS**
+### 원고 방향
+- DAY1 대부분은 평범한 입학 첫날
+- 한도윤은 004까지 중학교 때 알던 모습 그대로
+- 005에서 휴대전화 확인 후 갑자기 하교 계획을 바꾸는 정도의 작은 위화감만 노출
+- 귀향회 / 상담센터 / 실종 / 게이트 직접노출 없음
 
-### 데이터 정합성
-기존 초안 중 일부 condition/effect 표현이 현 엔진 DSL과 맞지 않는다.
-대표 예: `ANC-*`, `CULT-024 결과`, `GATE-009`, `CLUE-011 또는 012`, `돈`, `체력`, `ITEM_RECORD_*`, 일부 `KNOW_* +1`, 비정형 `판정` 문구.
-상세는 `CONTENT_INDEX.md` 참조.
+## 수정된 핵심 버그
 
-### 운영 SoT
-AI 역할문서는 활성화됐지만 FLOW/WRITING 역할문서가 지정한 콘텐츠 SoT 경로 중 일부는 아직 생성되지 않았다.
-`STORY_BIBLE`, `GAME_SYSTEM_SPEC`, `WRITING_MANUAL`, `STATE_REGISTRY`, `EVENT_SCENE_MAP`, `story/**` 초기화가 필요하다.
+### 첫 선택 이후 다음 대화로 넘어가지 않던 문제
+원인: `src/engine/effects.ts`의 assignment key 정규식이 숫자를 허용하지 않아 `FLAG_D01_P1_DONE=1`이 저장되지 않았음.
+
+수정:
+- State key parser를 `[A-Z0-9_]+`로 확장
+- `FLAG_D01_*` 등 숫자가 포함된 key 정상 저장
+- 기존 버그 저장파일도 history를 읽어 DAY1 진행 Flag를 자동 복구하도록 `PlayerView`에 호환 패치 추가
+
+따라서 새 게임뿐 아니라 기존 저장의 `이어하기`도 복구 대상으로 처리한다.
+
+## 콘텐츠 현황
+- 기존 재인덱싱 시 event 수: 34
+- DAY1 신규 Scene 003~005 추가 후 event 수: 37
+- DAY1 001~005: WRITING APPROVED / FLOW APPROVED / DEV 구현 완료
+- Visual/Audio 전용 연출은 아직 미작업이며 현재 텍스트 UI로 플레이 가능
+- DAY2 이후 기존 사건들은 대부분 draft/partial 상태
 
 ## 현재 Blocker
-치명적 release blocker는 없음.
-공개 작업 Blocker는 `ai/state/OPEN_BLOCKERS.md` 참조.
-- DAY1 실행 완성: WRITING/FLOW finalize/DEV 통합 필요
-- 초안 DSL 정합화 필요
-- 콘텐츠 SoT 골격 초기화 필요
-- FRIEND-004의 `KNOW_FRIEND_ODD` 설계 단절은 FLOW-001에서 구조상 해결됨
+치명적 Blocker 없음.
 
-## 완료된 총괄/Flow Task
-- `MASTER-001` — 저장소 콘텐츠 상태 재인덱싱 완료
-- `MASTER-002` — AI 협력시스템 v1.0 main 활성화 완료
-- `MASTER-003` — 새 총괄채팅 GitHub 복구 시험 완료
-- `FLOW-001` — PC1 DAY1 Scene 003~005 사전설계 완료
+해결 완료:
+- DAY1 002 이후 전개 단절
+- 숫자 포함 FLAG 저장 실패
+- 기존 버그 저장 호환
+- `KNOW_FRIEND_ODD` 생성 지점 부재
 
-## 현재 최우선 Active Task
-`WR-001 — PC1 DAY 1 Scene 003~005 원고`
+열린 문제:
+- DAY2 이후 기존 draft의 비표준 condition/effect DSL
+- State Registry / Event-Scene Map 등 콘텐츠 SoT 골격 미완성
 
-입력은 `flow/PC1_DAY1_FLOW.md`이며, 본문/대사/실제 선택지 문구/Immediate Reaction을 작성한 뒤 FLOW finalize로 넘긴다.
+세부: `ai/state/OPEN_BLOCKERS.md`
 
-## 병행 가능 Task
-`FLOW-002 — 콘텐츠 SoT / State Registry / DSL 표준 초기화`
+## 완료 Task
+- MASTER-001 — 재인덱싱
+- MASTER-002 — AI 협력시스템 활성화
+- MASTER-003 — 새 채팅 복구시험
+- FLOW-001 — DAY1 구조/Flow 확정
+- WR-001 — DAY1 003~005 원고
+- DEV-001 — DAY1 실행 통합 및 첫 선택 진행 버그 수정
 
-WR-001과 논리적으로 병행 가능하지만, 현재 사용자 체감 진척을 위해 DAY1 원고 완성을 우선한다.
+## 현재 최우선 Task
+`QA-001 — PC1 DAY 1 실제 플레이 검증`
 
-## 다음 제작 순서
-1. WR-001: 003~005 원고
-2. FLOW finalize
-3. FLOW-002: State Registry / Event-Scene Map / DSL 표준
-4. VIS-001: Visual/Audio Spec
-5. DEV-001: DAY1 전체 통합 및 DSL 정합화
-6. PLAYTEST
-7. MASTER REVIEW
+확인해야 할 경로:
+1. 새 게임에서 001 → 002 → 003 → 004 → 005가 끊김 없이 연결되는지
+2. 과거 001 선택 후 막힌 기존 저장에서 `이어하기` 시 002로 복구되는지
+3. 005 종료 후 `다음 날로`가 노출되는지
+4. DAY2 진입 시 기존 draft 데이터에서 즉시 비정상 진행이 발생하지 않는지
 
-## 주의
-이 파일은 대화 요약이 아니라 **현재 작업 가능한 상태**만 기록한다.
-과거 시행착오나 폐기된 토론은 넣지 않는다.
+## 다음 개발 방향
+DAY1 플레이 결과를 먼저 수정/확정한다.
+그 다음 `FLOW-002`에서 State Registry / DSL 표준을 잡고 DAY2 제작을 시작한다.
