@@ -33,32 +33,41 @@
 - RELATED: `PC1-D01-003~005`
 - NOTES: 평범한 입학 첫날을 충분히 쌓고 005에서 한도윤의 작은 위화감으로 종료.
 
-### DEV-001 — PC1 DAY 1 실행 통합 및 첫 선택 진행 버그 수정
+### DEV-001 — PC1 DAY 1 실행 통합 및 진행 버그 수정
 - STATUS: DONE
 - OWNER: DEV
-- OUTPUT: `shared/data/events-1.json`, `src/engine/effects.ts`, `src/components/PlayerView.tsx`
+- OUTPUT: `shared/data/events-1.json`, `src/engine/effects.ts`, `src/engine/conditions.ts`, `src/components/PlayerView.tsx`, `worker/index.ts`
 - RELATED: `PC1-D01-001~005`
 - NOTES:
-  - 숫자가 포함된 `FLAG_D01_*` State key를 effect parser가 저장하지 못하던 버그 수정.
+  - 숫자가 포함된 `FLAG_D01_*` State key를 effect parser가 저장하지 못하던 문제 수정.
+  - condition parser가 `FLAG_D01_P1_DONE=1`을 `DONE=1` 숫자조건으로 재해석하던 문제 수정.
   - 기존 버그 저장파일은 history 기반으로 진행 Flag 자동 복구.
+  - 런타임 스토리 콘텐츠는 GitHub 번들 seed를 Source of Truth로 고정하고 D1은 플레이메모 용도로 제한.
   - 001~005를 `P1_DONE → P2_DONE → P3_DONE → P4_DONE → D01_COMPLETE`로 연결.
-  - 콘텐츠 버전 `0.1.1`.
+  - 콘텐츠 버전 `0.1.2`.
+
+### QA-001 — PC1 DAY 1 실제 브라우저 플레이 검증
+- STATUS: DONE
+- OWNER: MASTER + DEV
+- INPUT: content v0.1.2
+- OUTPUT: TECH PLAYABLE
+- RELATED: `PC1-D01-001~005`
+- NOTES:
+  - Playwright + Chromium 실제 클릭 E2E를 CI에 추가.
+  - 실제 버튼 클릭으로 `캐릭터 선택 → 001 → 002 → 003 → 004 → 005 → 다음 날로` 전체 진행 PASS.
+  - legacy save에서 `이어하기 → 002` 복구 PASS.
+  - GitHub Actions run #44 Browser E2E: SUCCESS.
+  - 사용자 UAT는 Cloudflare production에서 `v0.1.2` 확인 후 수행.
 
 ## 현재 작업
 
-### QA-001 — PC1 DAY 1 실제 플레이 검증
+### DEPLOY-001 — Cloudflare production 최신본 확인
 - STATUS: REVIEW
-- OWNER: MASTER + DEV
-- PURPOSE: 신규/기존 저장 양쪽으로 DAY 1이 001부터 005까지 끊김 없이 진행되는지 확인
-- INPUT: content v0.1.1
-- OUTPUT: TECH PLAYABLE / 사용자 UAT
-- BLOCKER: 사용자 실제 브라우저 플레이 피드백
-- RELATED: `PC1-D01-001~005`
-- NOTES:
-  - GitHub Actions build: SUCCESS.
-  - DAY1 전체 선택 조합 324개 상태 전이 시뮬레이션: 324/324 PASS.
-  - 기존 버그 저장(history에 001 완료, FLAG 누락) 복구 후 002 진입조건: PASS.
-  - 남은 검증은 실제 배포 브라우저에서 사용자 UAT.
+- OWNER: DEV + MASTER
+- PURPOSE: main의 content v0.1.2가 workers.dev production에 반영되었는지 확인
+- OUTPUT: production header `RETURN CULT / v0.1.2` 및 실제 사용자 UAT
+- BLOCKER: 이 실행환경에서는 workers.dev URL 직접 조회가 불가하여 서버측 production 상태를 직접 확인하지 못함.
+- NOTES: Cloudflare Git production 설정은 main → `npm run build` → `npx wrangler deploy` 기준으로 기존 구성됨. 사용자는 사이트 상단 버전으로 최신 배포 여부를 즉시 판별할 수 있음.
 
 ### FLOW-002 — 콘텐츠 SoT / State Registry / DSL 표준 초기화
 - STATUS: READY
@@ -75,7 +84,7 @@
 - INPUT: `story/PC1_DAY1.md`, `flow/PC1_DAY1_FLOW.md`
 - OUTPUT: DAY1 Visual/Audio Spec
 - BLOCKER: 없음
-- NOTES: 텍스트 플레이 검증 이후 진행 가능.
+- NOTES: 텍스트 플레이 사용자 UAT 이후 진행 가능.
 
 ### DEV-002 — 기존 초안 DSL 정합화
 - STATUS: BLOCKED
@@ -86,7 +95,7 @@
 
 ## 다음 우선순위
 
-1. QA-001 — 사용자 실제 브라우저 DAY 1 플레이 확인
+1. DEPLOY-001 — production에서 v0.1.2 확인 + 사용자 DAY 1 UAT
 2. 사용자 수정 피드백 반영
 3. FLOW-002 — DAY 2 이후 확장을 위한 State/DSL 표준화
 4. DAY 2 제작 시작
