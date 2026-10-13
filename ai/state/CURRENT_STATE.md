@@ -19,6 +19,7 @@ LAST UPDATE: 2026-10-13
 - AI 협력시스템 v1.0 main 반영 commit: `262616465d70af5146d8771d2694d36d999d2cfe`
 - 재인덱싱 직전 main: `f8d4830ee111245370adf548ee028c488aa0586c`
 - 콘텐츠 재인덱싱 상세: `ai/state/CONTENT_INDEX.md`
+- PC1 DAY1 Flow Brief: `flow/PC1_DAY1_FLOW.md`
 
 ## 현재 마일스톤
 `PC-001 DAY 1 playable slice 완성`
@@ -43,12 +44,17 @@ LAST UPDATE: 2026-10-13
 - 나머지 32개는 원본 상태가 대부분 `초안`: WRITING/FLOW `DRAFT`, DEV `PARTIAL`
 - Scene 전용 Visual Spec/Asset은 아직 확인되지 않아 VISUAL `NONE`
 
-### PC-001 DAY 1
+### PC-001 DAY 1 Flow
 - PC-001 Canon: 고1 신입생, DAY 1, 해온고 1학년 교실
-- `PC1-D01-001` → 선택 후 `FLAG_D01_P1_DONE=1` → `PC1-D01-002`
-- `PC1-D01-002`는 4-choice 지원
-- 002 이후 현재 저장소에는 same-day 후속 Scene이 없음
-- 따라서 DAY 1 전체 playable slice는 **미완성**
+- `PC1-D01-001` → `PC1-D01-002` 기존 구현 유지
+- FLOW-001에서 다음 구조 승인:
+  - `PC1-D01-003`: 새 반 적응 / 평범한 기준선
+  - `PC1-D01-004`: 점심·교내 생활 / 도윤과 일상적 친밀도 강화
+  - `PC1-D01-005`: 하교 전 작은 위화감 / DAY 종료
+- 003~005는 장기분기 없이 재합류
+- 005의 모든 선택이 `KNOW_FRIEND_ODD=1`, `FLAG_D01_COMPLETE=1` 생성
+- DAY 1에서 귀향회/게이트를 직접 노출하지 않음
+- 실제 원고/실행데이터는 아직 미반영
 
 ### DEV
 - React/TypeScript/Vite 플레이어/관리자 앱 존재
@@ -69,28 +75,37 @@ AI 역할문서는 활성화됐지만 FLOW/WRITING 역할문서가 지정한 콘
 `STORY_BIBLE`, `GAME_SYSTEM_SPEC`, `WRITING_MANUAL`, `STATE_REGISTRY`, `EVENT_SCENE_MAP`, `story/**` 초기화가 필요하다.
 
 ## 현재 Blocker
-치명적 release blocker는 없으나 제작 진행에 영향을 주는 공개 Blocker가 존재한다.
-세부 내용: `ai/state/OPEN_BLOCKERS.md`
+치명적 release blocker는 없음.
+공개 작업 Blocker는 `ai/state/OPEN_BLOCKERS.md` 참조.
+- DAY1 실행 완성: WRITING/FLOW finalize/DEV 통합 필요
+- 초안 DSL 정합화 필요
+- 콘텐츠 SoT 골격 초기화 필요
+- FRIEND-004의 `KNOW_FRIEND_ODD` 설계 단절은 FLOW-001에서 구조상 해결됨
 
-## 완료된 총괄 Task
+## 완료된 총괄/Flow Task
 - `MASTER-001` — 저장소 콘텐츠 상태 재인덱싱 완료
 - `MASTER-002` — AI 협력시스템 v1.0 main 활성화 완료
 - `MASTER-003` — 새 총괄채팅 GitHub 복구 시험 완료
+- `FLOW-001` — PC1 DAY1 Scene 003~005 사전설계 완료
 
 ## 현재 최우선 Active Task
-`FLOW-001 — PC1 DAY 1 잔여 Scene 003~005 Scene Brief 및 DAY 종료 구조 확정`
+`WR-001 — PC1 DAY 1 Scene 003~005 원고`
 
-이 작업은 현재 2개 Scene에서 끊긴 PC1 DAY 1을 첫 완전한 playable slice로 연결하기 위한 선행 작업이다.
+입력은 `flow/PC1_DAY1_FLOW.md`이며, 본문/대사/실제 선택지 문구/Immediate Reaction을 작성한 뒤 FLOW finalize로 넘긴다.
+
+## 병행 가능 Task
+`FLOW-002 — 콘텐츠 SoT / State Registry / DSL 표준 초기화`
+
+WR-001과 논리적으로 병행 가능하지만, 현재 사용자 체감 진척을 위해 DAY1 원고 완성을 우선한다.
 
 ## 다음 제작 순서
-1. FLOW-001: Scene 003~005 사전설계
-2. FLOW-002: State Registry / Event-Scene Map / DSL 표준 초기화
-3. WR-001: 003~005 원고
-4. FLOW finalize
-5. VIS-001: Visual/Audio Spec
-6. DEV-001: DAY1 전체 통합 및 DSL 정합화
-7. PLAYTEST
-8. MASTER REVIEW
+1. WR-001: 003~005 원고
+2. FLOW finalize
+3. FLOW-002: State Registry / Event-Scene Map / DSL 표준
+4. VIS-001: Visual/Audio Spec
+5. DEV-001: DAY1 전체 통합 및 DSL 정합화
+6. PLAYTEST
+7. MASTER REVIEW
 
 ## 주의
 이 파일은 대화 요약이 아니라 **현재 작업 가능한 상태**만 기록한다.
