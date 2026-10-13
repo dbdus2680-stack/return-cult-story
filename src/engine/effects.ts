@@ -39,7 +39,7 @@ export function applyEffect(effect: string, input: GameState): GameState {
   }
 
   for (const token of effect.split(/[;；]/).map((x) => x.trim())) {
-    const assignment = token.match(/([A-Z_]+)\s*=\s*(true|false|1|0)/i);
+    const assignment = token.match(/([A-Z0-9_]+)\s*=\s*(true|false|1|0)/i);
     if (assignment) {
       const [, key, raw] = assignment;
       const value = raw === "1" || raw.toLowerCase() === "true";
@@ -48,7 +48,7 @@ export function applyEffect(effect: string, input: GameState): GameState {
       continue;
     }
 
-    const delta = token.match(/([A-Z_]+|관찰|말재주|배짱|전산|기술|스트레스|동조도|교단신뢰|친구)\s*([+-])\s*(\d+)/);
+    const delta = token.match(/([A-Z0-9_]+|관찰|말재주|배짱|전산|기술|스트레스|동조도|교단신뢰|친구)\s*([+-])\s*(\d+)/);
     if (delta) {
       const [, rawKey, sign, amountText] = delta;
       const key = statAliases[rawKey] ?? rawKey;
