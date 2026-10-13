@@ -18,13 +18,13 @@ test("PC-001 DAY 1 advances by real button clicks", async ({ page }) => {
   await page.getByRole("button", { name: "“갑자기 왜?”" }).click();
   await expectScene(page, "PC1-D01-003");
 
-  await page.getByRole("button", { name: "“넌 진짜 빠르다.”" }).click();
+  await page.getByRole("button", { name: "도윤 옆에서 자연스럽게 대화에 낀다." }).click();
   await expectScene(page, "PC1-D01-004");
 
-  await page.getByRole("button", { name: "“아니. 네가 먼저 먹어.”" }).click();
+  await page.getByRole("button", { name: "도윤과 중학교 때 얘기를 하며 점심을 먹는다." }).click();
   await expectScene(page, "PC1-D01-005");
 
-  await page.getByRole("button", { name: "“갑자기? 어디 가는데?”" }).click();
+  await page.getByRole("button", { name: "“뭔데? 같이 가자며.” 바로 묻는다." }).click();
   await expect(page.getByRole("button", { name: "다음 날로" })).toBeVisible();
 });
 
