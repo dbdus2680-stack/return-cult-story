@@ -24,12 +24,12 @@
 - NOTES: **새 총괄채팅이 가장 먼저 실행할 작업**. 사용자에게 과거 작업내용을 다시 묻지 말고 저장소를 직접 읽어 재구성한다.
 
 ### MASTER-002 — AI 협력시스템 v1.0 활성화
-- STATUS: REVIEW
+- STATUS: DONE
 - OWNER: 총괄관제실
-- PURPOSE: `ai-governance-v1`의 운영체계를 main에 반영하여 새 채팅의 기본 Source of Truth로 사용
+- PURPOSE: AI 운영체계를 main에 반영하여 새 채팅의 기본 Source of Truth로 사용
 - OUTPUT: 운영체계 v1.0 활성화
 - BLOCKER: 없음
-- NOTES: PR #3. 현 채팅 인수인계 완료 후 main 병합 대상.
+- NOTES: PR #3 squash merge 완료. main merge commit `262616465d70af5146d8771d2694d36d999d2cfe`.
 
 ### MASTER-003 — 새 총괄채팅 복구 시험
 - STATUS: READY
