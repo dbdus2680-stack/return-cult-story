@@ -22,6 +22,7 @@ const PRIORITIES: PlaytestNotePriority[] = ["나중에", "수정 필요", "중�
 type Choice = {
   label: string;
   condition?: string;
+  reaction?: string;
   effect: string;
 };
 
@@ -62,6 +63,7 @@ export function PlayerView({ content }: Props) {
   const [event, setEvent] = useState<StoryEvent | null>(null);
   const [saved, setSaved] = useState<LocalSave | null>(() => readSave());
   const [lastChoice, setLastChoice] = useState<PlaytestLastChoice | null>(null);
+  const [reaction, setReaction] = useState("");
   const [memoOpen, setMemoOpen] = useState(false);
   const [memoBody, setMemoBody] = useState("");
   const [memoCategory, setMemoCategory] = useState<PlaytestNoteCategory>("문장");
@@ -107,6 +109,7 @@ export function PlayerView({ content }: Props) {
     const nextState = { ...createInitialState(picked), runId: newRunId() };
     const nextEvent = chooseNextEvent(content.events, nextState);
     setLastChoice(null);
+    setReaction("");
     setState(nextState);
     setEvent(nextEvent);
   }
@@ -119,6 +122,7 @@ export function PlayerView({ content }: Props) {
       ? content.events.find((candidate) => candidate.ID === saved.eventId) ?? null
       : null;
     setLastChoice(saved.lastChoice ?? null);
+    setReaction("");
     setState(resumedState);
     setEvent(currentEvent ?? chooseNextEvent(content.events, resumedState));
   }
@@ -130,6 +134,7 @@ export function PlayerView({ content }: Props) {
     next.history.push(currentEvent.ID);
     next.seed = (next.seed + 0x6d2b79f5) >>> 0;
     setLastChoice({ eventId: currentEvent.ID, label: choice.label, effect: choice.effect });
+    setReaction(choice.reaction?.trim() ?? "");
     setState(next);
 
     const followUpId = currentEvent["후속/재등장"]?.trim();
@@ -142,12 +147,14 @@ export function PlayerView({ content }: Props) {
   function advanceDay() {
     if (!state) return;
     const next = { ...state, day: state.day + 1 };
+    setReaction("");
     setState(next);
     setEvent(chooseNextEvent(content.events, next));
   }
 
   function drawEvent() {
     if (!state) return;
+    setReaction("");
     setEvent(chooseNextEvent(content.events, state));
   }
 
@@ -155,6 +162,7 @@ export function PlayerView({ content }: Props) {
     setState(null);
     setEvent(null);
     setLastChoice(null);
+    setReaction("");
     setSaved(readSave());
   }
 
@@ -164,6 +172,7 @@ export function PlayerView({ content }: Props) {
     setState(null);
     setEvent(null);
     setLastChoice(null);
+    setReaction("");
   }
 
   async function submitMemo() {
@@ -260,10 +269,10 @@ export function PlayerView({ content }: Props) {
   }
 
   const choices: Choice[] = event ? [
-    { label: event["선택 A"], condition: event["A 조건"], effect: event["A 결과"] },
-    { label: event["선택 B"], condition: event["B 조건"], effect: event["B 결과"] },
-    { label: event["선택 C"], condition: event["C 조건"], effect: event["C 결과"] },
-    { label: event["선택 D"] ?? "", condition: event["D 조건"], effect: event["D 결과"] ?? "" },
+    { label: event["선택 A"], condition: event["A 조건"], reaction: event["A 반응"], effect: event["A 결과"] },
+    { label: event["선택 B"], condition: event["B 조건"], reaction: event["B 반응"], effect: event["B 결과"] },
+    { label: event["선택 C"], condition: event["C 조건"], reaction: event["C 반응"], effect: event["C 결과"] },
+    { label: event["선택 D"] ?? "", condition: event["D 조건"], reaction: event["D 반응"], effect: event["D 결과"] ?? "" },
   ].filter((choice) => Boolean(choice.label)) : [];
 
   return (
@@ -282,6 +291,9 @@ export function PlayerView({ content }: Props) {
       </section>
 
       <section className="story-panel">
+        {reaction && (
+          <p className="story-text" style={{ marginTop: 0, marginBottom: 8, color: "#b8cfcc" }}>{reaction}</p>
+        )}
         {event ? (
           <>
             <div className="event-meta">
