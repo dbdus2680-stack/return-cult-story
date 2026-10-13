@@ -49,11 +49,16 @@
 ### QA-001 — PC1 DAY 1 실제 플레이 검증
 - STATUS: REVIEW
 - OWNER: MASTER + DEV
-- PURPOSE: 브라우저에서 신규/기존 저장 양쪽으로 DAY 1이 001부터 005까지 끊김 없이 진행되는지 확인
+- PURPOSE: 신규/기존 저장 양쪽으로 DAY 1이 001부터 005까지 끊김 없이 진행되는지 확인
 - INPUT: content v0.1.1
-- OUTPUT: TECH PLAYABLE / 수정사항
-- BLOCKER: GitHub CI 최종 성공 확인 및 실제 사용자 플레이 피드백
+- OUTPUT: TECH PLAYABLE / 사용자 UAT
+- BLOCKER: 사용자 실제 브라우저 플레이 피드백
 - RELATED: `PC1-D01-001~005`
+- NOTES:
+  - GitHub Actions build: SUCCESS.
+  - DAY1 전체 선택 조합 324개 상태 전이 시뮬레이션: 324/324 PASS.
+  - 기존 버그 저장(history에 001 완료, FLAG 누락) 복구 후 002 진입조건: PASS.
+  - 남은 검증은 실제 배포 브라우저에서 사용자 UAT.
 
 ### FLOW-002 — 콘텐츠 SoT / State Registry / DSL 표준 초기화
 - STATUS: READY
@@ -81,7 +86,7 @@
 
 ## 다음 우선순위
 
-1. QA-001 — DAY 1 실제 플레이 확인
+1. QA-001 — 사용자 실제 브라우저 DAY 1 플레이 확인
 2. 사용자 수정 피드백 반영
 3. FLOW-002 — DAY 2 이후 확장을 위한 State/DSL 표준화
 4. DAY 2 제작 시작
