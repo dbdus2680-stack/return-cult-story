@@ -14,14 +14,12 @@
 ## 현재 작업
 
 ### MASTER-001 — 저장소 콘텐츠 상태 재인덱싱
-- STATUS: READY
+- STATUS: DONE
 - OWNER: 총괄관제실
-- PURPOSE: Story / Flow / Visual / Dev 현황을 읽고 DAY/Scene별 승인상태를 `CURRENT_STATE.md`에 반영
-- INPUT: repository `main` 최신 상태 + AI 운영문서
-- OUTPUT: 최신 `CURRENT_STATE.md`
-- DEPENDS ON: AI 협력시스템 v1.0 main 활성화
+- PURPOSE: Story / Flow / Visual / Dev 현황을 읽고 DAY/Scene별 승인상태를 현재상태에 반영
+- OUTPUT: `ai/state/CONTENT_INDEX.md`, 최신 `CURRENT_STATE.md`
 - BLOCKER: 없음
-- NOTES: **새 총괄채팅이 가장 먼저 실행할 작업**. 사용자에게 과거 작업내용을 다시 묻지 말고 저장소를 직접 읽어 재구성한다.
+- NOTES: main 기준 34 event, PC1 DAY1 2 Scene playable, 나머지 32 draft/partial로 재분류 완료.
 
 ### MASTER-002 — AI 협력시스템 v1.0 활성화
 - STATUS: DONE
@@ -32,14 +30,64 @@
 - NOTES: PR #3 squash merge 완료. main merge commit `262616465d70af5146d8771d2694d36d999d2cfe`.
 
 ### MASTER-003 — 새 총괄채팅 복구 시험
-- STATUS: READY
+- STATUS: DONE
 - OWNER: 총괄관제실
 - PURPOSE: 새 채팅에서 GitHub만으로 역할·현재상태·다음 작업을 복구할 수 있는지 검증
-- INPUT: `MASTER_ORCHESTRATOR.md`, `CURRENT_STATE.md`, `ACTIVE_TASKS.md`, `OPEN_BLOCKERS.md`, 최신 handover
-- OUTPUT: 복구 성공/실패 판정 및 필요한 운영문서 보완
+- OUTPUT: SUCCESS
 - DEPENDS ON: MASTER-002
 - BLOCKER: 없음
-- NOTES: 성공 기준은 `CURRENT_STATE.md`의 '인수인계 성공 판정' 참조.
+- NOTES: 과거 설명 재요청 없이 MASTER role, 4 rooms, state, tasks, blockers, handover 및 MASTER-001을 복구·실행함.
+
+### FLOW-001 — PC1 DAY 1 잔여 Scene 003~005 사전설계
+- STATUS: IN_PROGRESS
+- OWNER: FLOW
+- PURPOSE: 현재 PC1-D01-002에서 끊긴 DAY 1을 003~005까지 확장하고 DAY 종료 수렴점을 확정
+- INPUT: `PC1-D01-001`, `PC1-D01-002`, `ANC-001`, PC-001 Canon, FLOW 운영기준
+- OUTPUT: Scene Brief 003~005 + Scene 순서 + 선택지 수/분기예산 + State 제안 + DAY 종료조건
+- DEPENDS ON: MASTER-001
+- BLOCKER: 없음
+- RELATED SCENE/EVENT: PC1-D01-001~005 / ANC-001
+- NOTES: 원고 작성 전 FLOW 권한으로 구조만 확정한다. 003~005 본문/대사는 WRITING 담당.
+
+### FLOW-002 — 콘텐츠 SoT / State Registry / DSL 표준 초기화
+- STATUS: READY
+- OWNER: FLOW
+- PURPOSE: 역할문서가 지정한 콘텐츠 Source of Truth를 실제 저장소에 만들고 condition/effect 표준 문법을 정리
+- INPUT: `shared/data/**`, `src/engine/**`, `ai/state/CONTENT_INDEX.md`
+- OUTPUT: `flow/STATE_REGISTRY.md`, `flow/EVENT_SCENE_MAP.md`, 기획 DSL 표준, 필요한 STORY_BIBLE/GAME_SYSTEM_SPEC 골격
+- DEPENDS ON: MASTER-001
+- BLOCKER: 없음
+- NOTES: DEV-001의 입력 규약이 된다.
+
+### WR-001 — PC1 DAY 1 Scene 003~005 원고
+- STATUS: BLOCKED
+- OWNER: WRITING
+- PURPOSE: FLOW-001 Scene Brief에 맞춰 본문/대사/선택지/Immediate Reaction 집필
+- INPUT: FLOW-001 승인본
+- OUTPUT: 003~005 원고 승인 후보
+- DEPENDS ON: FLOW-001
+- BLOCKER: FLOW-001 미완료
+- RELATED SCENE/EVENT: PC1-D01-003~005
+
+### VIS-001 — PC1 DAY 1 Visual/Audio Spec
+- STATUS: BLOCKED
+- OWNER: VISUAL
+- PURPOSE: DAY1 전체 Scene의 배경/구도/표정/FX/BGM/SFX 및 asset 재사용/신규 필요 여부 정의
+- INPUT: WR-001 + FLOW finalize
+- OUTPUT: DAY1 Visual/Audio Spec
+- DEPENDS ON: WR-001, FLOW finalize
+- BLOCKER: 선행 콘텐츠 미완료
+- RELATED SCENE/EVENT: PC1-D01-001~005
+
+### DEV-001 — PC1 DAY 1 전체 통합 + 조건/효과 DSL 정합화
+- STATUS: READY
+- OWNER: DEV
+- PURPOSE: DAY1 003~005를 실행데이터에 통합하고, 표준 DSL과 런타임 파서를 정합화해 이후 초안 사건의 오작동을 줄임
+- INPUT: FLOW-002, WR-001, FLOW finalize, VIS-001 또는 placeholder 승인
+- OUTPUT: PC1 DAY1 full playable slice + build/test 결과
+- DEPENDS ON: FLOW-002 및 DAY1 콘텐츠 승인
+- BLOCKER: 선행 콘텐츠 미완료
+- RELATED SCENE/EVENT: PC1-D01-001~005
 
 ## 작업 등록 포맷
 ```text
