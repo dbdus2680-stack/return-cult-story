@@ -17,8 +17,8 @@ import type { StoryContent } from "./types";
 export const storyContent: StoryContent = {
   meta: {
     title: "귀향회",
-    version: "0.1.0",
-    source: "귀향회_스토리마스터_v0.1.xlsx",
+    version: "0.1.1",
+    source: "귀향회_스토리마스터_v0.1.xlsx + GitHub authored scenes",
     description: "한국 신도시의 사이비 종교를 추적하다 이계 차원기술의 진실과 마주하는 선택형 스토리 게임 초안",
   },
   truths: [...truths1, ...truths2] as StoryContent["truths"],
