@@ -133,6 +133,6 @@ code { color: #a8d0cb; }
   .continue-card { align-items: flex-start; flex-direction: column; }
   .continue-actions { width: 100%; }
   .continue-actions button { flex: 1; }
-  .story-text { font-size: 12px; line-height: 1.72; margin: 16px 0 20px; }
+  .story-text { font-size: 16px; line-height: 1.72; margin: 16px 0 20px; }
   .choice { font-size: 12px; padding: 9px 10px; }
 }
