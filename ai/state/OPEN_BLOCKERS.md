@@ -1,6 +1,47 @@
 # OPEN BLOCKERS
 
-현재 등록된 치명적 Blocker 없음.
+치명적 release blocker는 현재 없음.
+다만 첫 완전한 playable slice와 이후 콘텐츠 확장을 위해 아래 문제를 해결해야 한다.
+
+## BLOCKER-FLOW-001
+TYPE: FLOW
+SCENE/EVENT: PC1-D01-002 → PC1-D01-003~005 / ANC-001
+FOUND BY: MASTER-001 재인덱싱
+문제: 현재 DAY 1 실행데이터는 PC1-D01-002에서 종료되며, ANC-001이 설명하는 DAY 1 전체 흐름을 완결하는 후속 Scene이 저장소에 없다.
+영향: PC-001 DAY 1 전체 playable slice 미완성. DAY 종료 구조와 이후 친구/학교 State 회수 설계 불가.
+필요 조치: FLOW-001에서 003~005 Scene Brief, State, 수렴점, DAY 종료조건 확정.
+OWNER: FLOW
+STATUS: OPEN
+
+## BLOCKER-DATA-001
+TYPE: DATA
+SCENE/EVENT: 다수 draft event
+FOUND BY: MASTER-001 재인덱싱
+문제: 초안 데이터의 condition/effect 표현 중 현 런타임 DSL이 해석하지 못하거나 의도와 다르게 평가하는 표현이 존재한다. 예: `ANC-*`, `CULT-024 결과`, `GATE-009`, `CLUE-011 또는 012`, `돈`, `체력`, `ITEM_RECORD_*`, 일부 `KNOW_* +1`, 비정형 `판정` 결과.
+영향: DAY 2 이후 일부 사건의 도달조건이 무시되거나, 효과가 저장되지 않거나, 잘못 열린 사건이 생길 수 있다.
+필요 조치: FLOW-002에서 표준 DSL/State Registry 확정 후 DEV-001에서 parser/data 정합화.
+OWNER: FLOW + DEV
+STATUS: OPEN
+
+## BLOCKER-FLOW-002
+TYPE: FLOW
+SCENE/EVENT: FRIEND-004 및 PC-001 친구 루트
+FOUND BY: MASTER-001 재인덱싱
+문제: `FRIEND-004`는 `KNOW_FRIEND_ODD=1`을 요구하지만 현재 PC1 DAY 1 opening은 해당 State를 생성하지 않는다.
+영향: 현재 데이터 기준 PC-001에서 FRIEND-004가 도달 불가 상태다.
+필요 조치: DAY1 003~005 또는 다른 확정 Scene에서 해당 지식 State를 생성할지, FRIEND-004 조건을 새 Canon에 맞게 바꿀지 FLOW가 결정.
+OWNER: FLOW
+STATUS: OPEN
+
+## BLOCKER-ROLE-001
+TYPE: ROLE
+SCENE/EVENT: 프로젝트 공통
+FOUND BY: MASTER-001 재인덱싱
+문제: 역할문서가 Source of Truth로 지정한 `docs/STORY_BIBLE.md`, `docs/GAME_SYSTEM_SPEC.md`, `docs/WRITING_MANUAL.md`, `flow/STATE_REGISTRY.md`, `flow/EVENT_SCENE_MAP.md`, `story/**`가 아직 저장소에 없다.
+영향: 기능실 권한은 정의됐지만 콘텐츠 Canon/State/Scene의 장기 기준점이 raw JSON과 대화 산출물에 분산될 위험이 있다.
+필요 조치: FLOW-002 중심으로 콘텐츠 SoT 골격 초기화. WRITING_MANUAL/story 구조는 WRITING 단계에서 연결.
+OWNER: MASTER + FLOW + WRITING
+STATUS: OPEN
 
 ## 등록 형식
 ```text
