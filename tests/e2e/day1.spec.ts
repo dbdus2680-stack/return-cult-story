@@ -4,7 +4,7 @@ async function expectScene(page: import("@playwright/test").Page, id: string) {
   await expect(page.locator(".event-meta")).toContainText(id);
 }
 
-test("PC-001 DAY 1 advances by real button clicks", async ({ page }) => {
+test("PC-001 DAY 1 advances by real button clicks with choice reactions", async ({ page }) => {
   await page.goto("/");
   await page.evaluate(() => localStorage.clear());
   await page.reload();
@@ -13,18 +13,23 @@ test("PC-001 DAY 1 advances by real button clicks", async ({ page }) => {
   await expectScene(page, "PC1-D01-001");
 
   await page.getByRole("button", { name: "“뭐야. 너 여기 왜 있어?”" }).click();
+  await expect(page.getByText("왜 있긴. 입학했으니까 있지. 같은 반인 건 나도 방금 알았어.")).toBeVisible();
   await expectScene(page, "PC1-D01-002");
 
   await page.getByRole("button", { name: "“갑자기 왜?”" }).click();
+  await expect(page.getByText("그냥. 너 원래 새 학교 같은 거 별로 안 좋아했잖아.")).toBeVisible();
   await expectScene(page, "PC1-D01-003");
 
   await page.getByRole("button", { name: "도윤 옆에서 자연스럽게 대화에 낀다." }).click();
+  await expect(page.getByText("거 봐. 통역 필요 없다니까.")).toBeVisible();
   await expectScene(page, "PC1-D01-004");
 
   await page.getByRole("button", { name: "도윤과 중학교 때 얘기를 하며 점심을 먹는다." }).click();
+  await expect(page.getByText("야, 그건 여기서 말하지 마.")).toBeVisible();
   await expectScene(page, "PC1-D01-005");
 
   await page.getByRole("button", { name: "“뭔데? 같이 가자며.” 바로 묻는다." }).click();
+  await expect(page.getByText("진짜 별건 아니야. 집에서 좀 오라 그래서.")).toBeVisible();
   await expect(page.getByRole("button", { name: "다음 날로" })).toBeVisible();
 });
 
