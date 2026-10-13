@@ -7,10 +7,10 @@
 TYPE: FLOW
 SCENE/EVENT: PC1-D01-002 → PC1-D01-003~005 / ANC-001
 FOUND BY: MASTER-001 재인덱싱
-문제: 현재 DAY 1 실행데이터는 PC1-D01-002에서 종료되며, ANC-001이 설명하는 DAY 1 전체 흐름을 완결하는 후속 Scene이 저장소에 없다.
-영향: PC-001 DAY 1 전체 playable slice 미완성. DAY 종료 구조와 이후 친구/학교 State 회수 설계 불가.
-필요 조치: FLOW-001에서 003~005 Scene Brief, State, 수렴점, DAY 종료조건 확정.
-OWNER: FLOW
+문제: 현재 실행데이터는 PC1-D01-002에서 종료된다. FLOW 사전설계는 `flow/PC1_DAY1_FLOW.md`로 완료됐으나 실제 원고/실행데이터 003~005는 아직 없다.
+영향: PC-001 DAY 1 전체 playable slice 미완성.
+필요 조치: WR-001 집필 → FLOW finalize → DEV-001 통합.
+OWNER: WRITING + FLOW + DEV
 STATUS: OPEN
 
 ## BLOCKER-DATA-001
@@ -27,11 +27,11 @@ STATUS: OPEN
 TYPE: FLOW
 SCENE/EVENT: FRIEND-004 및 PC-001 친구 루트
 FOUND BY: MASTER-001 재인덱싱
-문제: `FRIEND-004`는 `KNOW_FRIEND_ODD=1`을 요구하지만 현재 PC1 DAY 1 opening은 해당 State를 생성하지 않는다.
-영향: 현재 데이터 기준 PC-001에서 FRIEND-004가 도달 불가 상태다.
-필요 조치: DAY1 003~005 또는 다른 확정 Scene에서 해당 지식 State를 생성할지, FRIEND-004 조건을 새 Canon에 맞게 바꿀지 FLOW가 결정.
+문제: `FRIEND-004`는 `KNOW_FRIEND_ODD=1`을 요구하지만 기존 PC1 DAY 1 opening은 해당 State를 생성하지 않았다.
+영향: 기존 데이터만으로는 PC-001에서 FRIEND-004가 도달 불가였다.
+필요 조치: FLOW-001에서 `PC1-D01-005`의 모든 선택이 `KNOW_FRIEND_ODD=1`을 생성하도록 확정함. WR/DEV 반영 필요.
 OWNER: FLOW
-STATUS: OPEN
+STATUS: RESOLVED
 
 ## BLOCKER-ROLE-001
 TYPE: ROLE
